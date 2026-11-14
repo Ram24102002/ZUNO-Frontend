@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/zuno/:path*",
+      "destination": "https://140-245-225-16.sslip.io/api/zuno/:path*"
+    },
+    {
+      "source": "/storage/:path*",
+      "destination": "https://140-245-225-16.sslip.io/storage/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

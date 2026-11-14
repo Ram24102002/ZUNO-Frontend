@@ -10,7 +10,7 @@ export default function ProductImage({ product, src = product.images?.[0], class
       className={`relative flex w-full items-center justify-center overflow-hidden ${className}`}
       style={{ backgroundColor: product.swatch || '#e5e5e5' }}
     >
-      <ClawMark className="absolute -right-6 -bottom-6 h-40 w-40 text-brand/40" />
+      <ClawMark className="absolute -right-6 -bottom-6 h-40 w-40 opacity-40" />
       <span className="display text-4xl text-white/30">ZUNO</span>
     </div>
   )

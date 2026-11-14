@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import ProductImage from './ProductImage'
+import { Stars } from './Stars'
 
 export default function ProductCard({ product }) {
   const hoverImage = product.images?.[1]
@@ -33,6 +34,11 @@ export default function ProductCard({ product }) {
           <p className="text-sm text-ink/60">
             {product.colors.length > 1 ? `${product.colors.length} colours` : product.colors[0]}
           </p>
+          {product.rating?.count > 0 && (
+            <p className="mt-1 flex items-center gap-1 text-xs text-ink/60">
+              <Stars value={product.rating.average} className="h-3.5 w-3.5" /> ({product.rating.count})
+            </p>
+          )}
         </div>
         <p className="font-bold">₹{product.price}</p>
       </div>

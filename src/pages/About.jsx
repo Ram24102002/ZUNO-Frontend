@@ -42,7 +42,7 @@ export default function About() {
       <section className="bg-brand-light py-20">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex items-center gap-3">
-            <ClawMark className="h-12 w-12 text-brand" />
+            <ClawMark className="h-12 w-12" />
             <h2 className="display text-4xl">
               What our <span className="text-brand">claw</span> says
             </h2>
