@@ -25,7 +25,6 @@ export default function Product() {
 
   useEffect(() => {
     // Also runs when a related product is opened from this page
-    window.scrollTo(0, 0)
     setNotFound(false)
     setAdded(false)
     setHint(null)

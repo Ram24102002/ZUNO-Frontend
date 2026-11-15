@@ -86,7 +86,7 @@ export default function Shop() {
       </div>
 
       <div className="mb-8 space-y-4">
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => setFilter('category', '')} className={chipClass(!filters.category)}>All</button>
           {options?.categories.map((c) => (
             <button key={c.slug} onClick={() => setFilter('category', c.slug)} className={chipClass(filters.category === c.slug)}>

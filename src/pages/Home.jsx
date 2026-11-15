@@ -28,7 +28,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Shop />
+
 
       <section className="mx-auto max-w-6xl px-4 pb-20">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand to-brand-dark px-6 py-14 text-center text-white sm:px-12 sm:text-left">
@@ -51,6 +51,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <Shop />
 
       <Lookbook />
 
