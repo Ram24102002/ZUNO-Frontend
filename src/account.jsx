@@ -27,8 +27,6 @@ export function AccountProvider({ children }) {
     customer,
     ready,
     setCustomer,
-    login: (email, password) => send('/account/login', { method: 'POST', body: { email, password } }),
-    register: (details) => send('/account/register', { method: 'POST', body: details }),
     logout: () => send('/account/logout', { method: 'POST' }),
     update: (details) => send('/account', { method: 'PUT', body: details }),
     saveAddress: (address) =>

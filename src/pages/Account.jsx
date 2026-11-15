@@ -32,135 +32,34 @@ function useSubmit(action) {
   return { busy, error, submit }
 }
 
-function LoginForm({ onSwitch }) {
-  const { login } = useAccount()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const { busy, error, submit } = useSubmit(() => login(form.email, form.password))
-  const field = (name) => ({ id: `login-${name}`, value: form[name], onChange: (e) => setForm((f) => ({ ...f, [name]: e.target.value })) })
-
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <div>
-        <label htmlFor="login-email" className={labelClass}>Email</label>
-        <input {...field('email')} required type="email" autoComplete="email" className={inputClass} />
-      </div>
-      <div>
-        <div className="flex justify-between">
-          <label htmlFor="login-password" className={labelClass}>Password</label>
-          <button type="button" onClick={() => onSwitch('forgot')} className="text-sm font-semibold text-brand">Forgot?</button>
-        </div>
-        <input {...field('password')} required type="password" autoComplete="current-password" className={inputClass} />
-      </div>
-      {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
-      <button disabled={busy} className={primaryButton}>{busy ? 'Logging in…' : 'Log in'}</button>
-    </form>
-  )
-}
-
-function RegisterForm() {
-  const { register } = useAccount()
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' })
-  const [notice, setNotice] = useState(null)
-  const { busy, error, submit } = useSubmit(async () => {
-    const data = await register(form)
-    if (data.message) setNotice(data.message) // email verification is switched on in the admin
-  })
-  const field = (name) => ({ id: `register-${name}`, value: form[name], onChange: (e) => setForm((f) => ({ ...f, [name]: e.target.value })) })
-
-  if (notice) return <p role="status" className="rounded-2xl bg-brand-light p-5">{notice}</p>
-
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="register-firstName" className={labelClass}>First name</label>
-          <input {...field('firstName')} required maxLength={60} autoComplete="given-name" className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="register-lastName" className={labelClass}>Last name</label>
-          <input {...field('lastName')} maxLength={60} autoComplete="family-name" className={inputClass} />
-        </div>
-      </div>
-      <div>
-        <label htmlFor="register-email" className={labelClass}>Email</label>
-        <input {...field('email')} required type="email" maxLength={120} autoComplete="email" className={inputClass} />
-      </div>
-      <div>
-        <label htmlFor="register-phone" className={labelClass}>Phone (optional)</label>
-        <input {...field('phone')} type="tel" pattern="\+?[\d\s\-]{8,20}" title="8 to 20 digits" autoComplete="tel" className={inputClass} />
-      </div>
-      <div>
-        <label htmlFor="register-password" className={labelClass}>Password</label>
-        <input {...field('password')} required type="password" minLength={8} autoComplete="new-password" className={inputClass} />
-        <p className="mt-1 text-xs text-ink/50">At least 8 characters.</p>
-      </div>
-      {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
-      <button disabled={busy} className={primaryButton}>{busy ? 'Creating account…' : 'Create account'}</button>
-    </form>
-  )
-}
-
-function ForgotForm({ onSwitch }) {
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(null)
-  const { busy, error, submit } = useSubmit(async () => {
-    const { message } = await api('/account/forgot-password', { method: 'POST', body: { email } })
-    setSent(message)
-  })
-
-  return (
-    <div className="space-y-4">
-      {sent ? (
-        <p role="status" className="rounded-2xl bg-brand-light p-5">{sent}</p>
-      ) : (
-        <form onSubmit={submit} className="space-y-4">
-          <p className="text-sm text-ink/70">Enter your email and we will send you a link to choose a new password.</p>
-          <div>
-            <label htmlFor="forgot-email" className={labelClass}>Email</label>
-            <input id="forgot-email" value={email} onChange={(e) => setEmail(e.target.value)} required type="email" autoComplete="email" className={inputClass} />
-          </div>
-          {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
-          <button disabled={busy} className={primaryButton}>{busy ? 'Sending…' : 'Send reset link'}</button>
-        </form>
-      )}
-      <button onClick={() => onSwitch('login')} className="text-sm font-semibold text-brand">← Back to log in</button>
-    </div>
-  )
-}
-
-/** Full-page trip to Google and back (the backend sends the shopper on to `from` afterwards). */
+/** The only way in: a full-page trip to Google and back (the backend sends the shopper on to `from` afterwards). */
 function GoogleButton({ from }) {
-  const [enabled, setEnabled] = useState(false)
+  const [enabled, setEnabled] = useState(null) // null while checking
 
   useEffect(() => {
-    api('/config').then((c) => setEnabled(Boolean(c.googleLogin))).catch(() => {})
+    api('/config').then((c) => setEnabled(Boolean(c.googleLogin))).catch(() => setEnabled(false))
   }, [])
 
-  if (!enabled) return null
+  if (enabled === null) return null
+  if (!enabled) return <p className="text-sm text-ink/60">Signing in is not available right now. Please try again later.</p>
 
   return (
-    <>
-      <a
-        href={`/api/zuno/account/google?from=${encodeURIComponent(from)}`}
-        className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-neutral-200 py-3 text-sm font-semibold transition hover:border-ink"
-      >
-        <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
-          <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
-          <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
-          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" />
-          <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
-        </svg>
-        Continue with Google
-      </a>
-      <p className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-ink/40">
-        <span className="h-px flex-1 bg-neutral-200" /> or <span className="h-px flex-1 bg-neutral-200" />
-      </p>
-    </>
+    <a
+      href={`/api/zuno/account/google?from=${encodeURIComponent(from)}`}
+      className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-neutral-200 py-3 text-sm font-semibold transition hover:border-ink"
+    >
+      <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+        <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+      </svg>
+      Continue with Google
+    </a>
   )
 }
 
 function SignedOut() {
-  const [mode, setMode] = useState('login')
   const location = useLocation()
   // Google sign-in comes back here with ?error=… when it could not finish
   const googleError = new URLSearchParams(location.search).get('error')
@@ -168,21 +67,11 @@ function SignedOut() {
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="display text-4xl">
-        {mode === 'register' ? <>Join <span className="text-brand">ZUNO</span></> : mode === 'forgot' ? <>Reset <span className="text-brand">password</span></> : <>Welcome <span className="text-brand">back</span></>}
+        Welcome to <span className="text-brand">ZUNO</span>
       </h1>
-      {mode !== 'forgot' && (
-        <div className="mt-8 mb-6 flex gap-6 border-b border-neutral-200">
-          <button onClick={() => setMode('login')} className={tabClass(mode === 'login')}>Log in</button>
-          <button onClick={() => setMode('register')} className={tabClass(mode === 'register')}>Create account</button>
-        </div>
-      )}
+      <p className="mt-3 mb-8 text-ink/70">Sign in with your Google account. New here? The same button creates your account.</p>
       {googleError && <p role="alert" className="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{googleError}</p>}
-      <div className={mode === 'forgot' ? 'mt-8' : ''}>
-        {mode !== 'forgot' && <GoogleButton from={location.state?.from ?? '/account'} />}
-        {mode === 'login' && <LoginForm onSwitch={setMode} />}
-        {mode === 'register' && <RegisterForm />}
-        {mode === 'forgot' && <ForgotForm onSwitch={setMode} />}
-      </div>
+      <GoogleButton from={location.state?.from ?? '/account'} />
       <p className="mt-8 text-center text-sm text-ink/60">
         You can also check out as a guest. An account keeps your addresses and order history.
       </p>
@@ -295,13 +184,12 @@ function Addresses() {
 function Profile() {
   const { customer, update } = useAccount()
   const [form, setForm] = useState({
-    firstName: customer.firstName, lastName: customer.lastName ?? '', phone: customer.phone ?? '', currentPassword: '', newPassword: '',
+    firstName: customer.firstName, lastName: customer.lastName ?? '', phone: customer.phone ?? '',
   })
   const [saved, setSaved] = useState(false)
   const { busy, error, submit } = useSubmit(async () => {
     setSaved(false)
-    await update({ ...form, phone: form.phone || null, newPassword: form.newPassword || null, currentPassword: form.currentPassword || null })
-    setForm((f) => ({ ...f, currentPassword: '', newPassword: '' }))
+    await update({ ...form, phone: form.phone || null })
     setSaved(true)
   })
   const field = (name) => ({ id: `profile-${name}`, value: form[name], onChange: (e) => setForm((f) => ({ ...f, [name]: e.target.value })) })
@@ -326,23 +214,6 @@ function Profile() {
         <label htmlFor="profile-phone" className={labelClass}>Phone</label>
         <input {...field('phone')} type="tel" pattern="\+?[\d\s\-]{8,20}" title="8 to 20 digits" className={inputClass} />
       </div>
-      <fieldset className="space-y-4 rounded-2xl bg-neutral-50 p-5">
-        <legend className="px-1 text-sm font-semibold">
-          {customer.hasPassword ? 'Change password (optional)' : 'Set a password (optional)'}
-        </legend>
-        {customer.hasPassword ? (
-          <div>
-            <label htmlFor="profile-currentPassword" className={labelClass}>Current password</label>
-            <input {...field('currentPassword')} type="password" required={Boolean(form.newPassword)} autoComplete="current-password" className={inputClass} />
-          </div>
-        ) : (
-          <p className="text-sm text-ink/60">You sign in with Google. Add a password to also log in with your email.</p>
-        )}
-        <div>
-          <label htmlFor="profile-newPassword" className={labelClass}>New password</label>
-          <input {...field('newPassword')} type="password" minLength={8} autoComplete="new-password" className={inputClass} />
-        </div>
-      </fieldset>
       {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
       {saved && <p role="status" className="text-sm text-green-700">Saved.</p>}
       <button disabled={busy} className={primaryButton}>{busy ? 'Saving…' : 'Save changes'}</button>

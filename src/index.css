@@ -18,3 +18,39 @@ body {
 .display {
   @apply font-black uppercase italic tracking-tight;
 }
+
+/* 404 page: claw strokes rip across the number, which jolts on impact, while faint claw marks drift */
+.claw-slash {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: claw-slash 0.35s cubic-bezier(0.7, 0, 0.3, 1) var(--delay, 0s) forwards;
+}
+.nf-shake {
+  animation: nf-shake 0.5s ease-out 0.45s both;
+}
+.claw-float {
+  animation: claw-float 7s ease-in-out infinite;
+}
+.claw-float-late {
+  animation: claw-float 8s ease-in-out -3s infinite;
+}
+
+@keyframes claw-slash {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes nf-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  20% { transform: translate(-8px, 4px) rotate(-2deg); }
+  40% { transform: translate(6px, -3px) rotate(1.5deg); }
+  60% { transform: translate(-4px, 2px) rotate(-1deg); }
+  80% { transform: translate(2px, -1px) rotate(0.5deg); }
+}
+@keyframes claw-float {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-18px) rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claw-slash { animation: none; stroke-dashoffset: 0; }
+  .nf-shake, .claw-float, .claw-float-late { animation: none; }
+}

@@ -27,7 +27,7 @@ changes, update both destinations in `vercel.json`.**
 ## Structure
 
 ```
-src/pages         Home, Product, Design, Cart, About, Account, AccountOrder, ResetPassword
+src/pages         Home, Product, Design, Cart, About, Account (Google sign-in only), AccountOrder, NotFound (404)
 src/components    Shop (search + filters), Reviews, AddressForm, TeeEditor, Navbar, ...
 src/api.js        API helper (session cookie + CSRF header)
 src/account.jsx   the logged-in customer
