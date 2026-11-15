@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/api/zuno/:path*",
-      "destination": "https://140-245-225-16.sslip.io/api/zuno/:path*"
+      "destination": "https://129-225-119-92.sslip.io/api/zuno/:path*"
     },
     {
       "source": "/storage/:path*",
-      "destination": "https://140-245-225-16.sslip.io/storage/:path*"
+      "destination": "https://129-225-119-92.sslip.io/storage/:path*"
     },
     {
       "source": "/(.*)",
