@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ProductImage from '../components/ProductImage'
 import ProductCard from '../components/ProductCard'
+import HeartButton from '../components/HeartButton'
 import Reviews from '../components/Reviews'
 import { Stars } from '../components/Stars'
 import { useCart } from '../cart'
@@ -90,7 +91,10 @@ export default function Product() {
 
         <div className="md:py-6">
           <Link to="/" className="text-sm font-medium text-ink/60 hover:text-brand">← Back to shop</Link>
-          <h1 className="display mt-4 text-4xl">{product.name}</h1>
+          <div className="mt-4 flex items-start justify-between gap-4">
+            <h1 className="display text-4xl">{product.name}</h1>
+            <HeartButton product={product} className="mt-1 rounded-full border-2 border-neutral-200 p-2.5 hover:border-red-300" iconClass="h-6 w-6" />
+          </div>
           {product.rating.count > 0 && (
             <a href="#reviews" className="mt-2 inline-flex items-center gap-2 text-sm text-ink/70 hover:text-brand">
               <Stars value={product.rating.average} /> {product.rating.average} · {product.rating.count} review{product.rating.count === 1 ? '' : 's'}

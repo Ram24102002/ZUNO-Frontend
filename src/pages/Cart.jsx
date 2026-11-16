@@ -277,8 +277,11 @@ export default function Cart() {
           </p>
         </div>
         <div className="mt-6 flex justify-center gap-6">
-          {customer && <Link to={`/account/orders/${order.id}`} className="font-semibold text-brand">View order</Link>}
+          {customer
+            ? <Link to={`/account/orders/${order.id}`} className="font-semibold text-brand">View order</Link>
+            : <Link to="/orders" className="font-semibold text-brand">Track order</Link>}
           <Link to="/" className="font-semibold text-brand">Back to shop</Link>
+          <Link to="/contact" className="font-semibold text-brand">Contact us</Link>
         </div>
       </div>
     )
@@ -319,6 +322,7 @@ export default function Cart() {
           <p className="flex justify-between text-lg font-bold"><span>Total</span><span>₹{amount}</span></p>
         </div>
         <p className="mt-1 text-sm text-ink/60">Free delivery.</p>
+        <p className="mt-1 text-sm text-ink/60">Questions about sizing or delivery? <Link to="/contact" className="font-semibold text-brand">Contact us</Link></p>
         <Coupon lines={lines} coupon={quote?.coupon} onChange={setQuote} onChecking={setCheckingCoupon} locked={locked} />
       </section>
 

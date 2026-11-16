@@ -52,6 +52,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Full-width photo banner */}
+      <section className="relative mb-20 h-[60vh] min-h-[380px] overflow-hidden bg-ink">
+        <img src="/images/lookbook/gym.webp" alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        <div className="relative flex h-full flex-col justify-end px-4 pb-12 text-white sm:px-10 sm:pb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/80">New drop</p>
+          <h2 className="display mt-2 text-4xl leading-none sm:text-6xl">
+            Built for <span className="text-brand">the grind.</span>
+          </h2>
+          <p className="mt-4 max-w-md text-white/85">Heavyweight oversized tees that keep up with every rep.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/shop-men" className="bg-white px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-brand hover:text-white">
+              Shop men
+            </Link>
+            <Link to="/shop-women" className="bg-white px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-brand hover:text-white">
+              Shop women
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <Shop />
 
       <Lookbook />

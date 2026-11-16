@@ -58,7 +58,9 @@ export default function AccountOrder() {
         <h1 className="display text-4xl">Order <span className="text-brand">#{order.number}</span></h1>
         <StatusBadge order={order} />
       </div>
-      <p className="mt-2 text-ink/60">Placed {formatDate(order.date)} · {order.payment}</p>
+      <p className="mt-2 text-ink/60">
+        Placed {formatDate(order.date)} · {order.payment} · <Link to="/contact" className="font-semibold text-brand">Help with this order</Link>
+      </p>
       {order.tracking.length > 0 && (
         <p className="mt-2 text-sm">Tracking number: <span className="font-semibold">{order.tracking.join(', ')}</span></p>
       )}

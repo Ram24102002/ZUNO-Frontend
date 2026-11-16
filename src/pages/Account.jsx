@@ -75,6 +75,9 @@ function SignedOut() {
       <p className="mt-8 text-center text-sm text-ink/60">
         You can also check out as a guest. An account keeps your addresses and order history.
       </p>
+      <p className="mt-3 text-center text-sm text-ink/60">
+        Trouble signing in? <Link to="/contact" className="font-semibold text-brand">Contact us</Link>
+      </p>
     </div>
   )
 }
@@ -90,7 +93,7 @@ export function StatusBadge({ order }) {
   return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(order.status)}`}>{order.statusLabel}</span>
 }
 
-function Orders() {
+export function Orders() {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1)
@@ -256,6 +259,9 @@ export default function Account() {
       {tab === 'orders' && <Orders />}
       {tab === 'addresses' && <Addresses />}
       {tab === 'profile' && <Profile />}
+      <p className="mt-12 border-t border-neutral-200 pt-6 text-sm text-ink/60">
+        Need help with an order? <Link to="/contact" className="font-semibold text-brand">Contact us</Link>
+      </p>
     </div>
   )
 }

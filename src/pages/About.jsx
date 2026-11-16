@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { INSTAGRAM_URL } from '../config'
 import { ClawMark } from '../components/Logo'
 
@@ -36,6 +37,12 @@ export default function About() {
           >
             Follow @zuno.clo
           </a>
+          <Link
+            to="/contact"
+            className="mt-10 ml-3 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-brand-dark"
+          >
+            Contact us
+          </Link>
         </div>
       </div>
 
