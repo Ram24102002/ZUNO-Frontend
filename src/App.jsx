@@ -14,6 +14,8 @@ import ShopGender from './pages/ShopGender'
 import Contact from './pages/Contact'
 import Orders from './pages/Orders'
 import Wishlist from './pages/Wishlist'
+import Search from './pages/Search'
+import ComingSoon from './pages/ComingSoon'
 
 // The design studio pulls in the canvas library, so it is only loaded when visited
 const Design = lazy(() => import('./pages/Design'))
@@ -28,11 +30,13 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<Product />} />
-          <Route path="/design" element={<Suspense fallback={loading}><Design /></Suspense>} />
+          {/* Design studio disabled for now; swap back to <Suspense fallback={loading}><Design /></Suspense> to re-enable */}
+          <Route path="/design" element={<ComingSoon />} />
           <Route path="/shop-women" element={<ShopGender key="women" gender="women" />} />
           <Route path="/shop-men" element={<ShopGender key="men" gender="men" />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/cart" element={<Cart />} />
