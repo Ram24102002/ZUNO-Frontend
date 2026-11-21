@@ -8,11 +8,11 @@ export function ClawMark({ className = 'h-8 w-8' }) {
   )
 }
 
-export default function Logo() {
+export default function Logo({ wordmarkClass = 'display' }) {
   return (
     <span className="flex items-center gap-1.5">
       <ClawMark className="h-9 w-9" />
-      <span className="display text-2xl text-ink">ZUNO</span>
+      <span className={`${wordmarkClass} text-2xl text-ink`}>ZUNO</span>
     </span>
   )
 }

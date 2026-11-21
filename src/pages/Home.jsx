@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Shop from '../components/Shop'
 import { ClawMark } from '../components/Logo'
 import Lookbook from '../components/Lookbook'
+import Testimonials from '../components/Testimonials'
 
 export default function Home() {
   return (
@@ -16,7 +17,7 @@ export default function Home() {
           <h1 className="display mt-6 text-6xl text-ink sm:text-8xl">
             Wear the <span className="text-brand">Mindset.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-md text-ink/70">
+          <p className="mx-auto mt-6 max-w-md text-ink/70 md:text-xs">
             Oversized T-shirts made for people who move with purpose. Limited first drop.
           </p>
           <a
@@ -76,6 +77,8 @@ export default function Home() {
       <Shop />
 
       <Lookbook />
+
+      <Testimonials />
 
       <section className="relative overflow-hidden py-24 text-center">
         <ClawMark className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 opacity-10" />

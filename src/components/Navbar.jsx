@@ -60,7 +60,7 @@ const Chevron = () => (
 )
 
 const textClass = (active) =>
-  `text-sm font-semibold uppercase tracking-wider transition ${
+  `text-xs font-semibold uppercase tracking-wider transition ${
     active ? 'text-brand' : 'text-ink/70 hover:text-brand'
   }`
 
@@ -176,7 +176,7 @@ export default function Navbar() {
         </div>
 
         {/* Center: logo */}
-        <Link to="/" aria-label="ZUNO home" className="justify-self-center"><Logo /></Link>
+        <Link to="/" aria-label="ZUNO home" className="justify-self-center"><Logo wordmarkClass="font-['Exo_2'] font-bold italic" /></Link>
 
         {/* Right: search + account + wishlist + cart */}
         <div className="flex items-center justify-end gap-4 sm:gap-6">
