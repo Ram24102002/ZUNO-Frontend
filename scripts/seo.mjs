@@ -44,13 +44,18 @@ const pages = [
   },
 ]
 
+// The backend may be restarting (a backend deploy at the same time), so try a few times
 let products = []
-try {
-  const res = await fetch(`${API}/products`, { signal: AbortSignal.timeout(15000) })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  products = await res.json()
-} catch (err) {
-  console.warn(`[seo] Could not load products (${err.message}); product pages left out of the sitemap.`)
+for (let attempt = 1; attempt <= 4; attempt++) {
+  try {
+    const res = await fetch(`${API}/products`, { signal: AbortSignal.timeout(15000) })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    products = await res.json()
+    break
+  } catch (err) {
+    if (attempt === 4) console.warn(`[seo] Could not load products (${err.message}); product pages left out of the sitemap.`)
+    else await new Promise((r) => setTimeout(r, 15000))
+  }
 }
 
 const productLinks = products
