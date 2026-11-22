@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Shop from '../components/Shop'
 import { ClawMark } from '../components/Logo'
@@ -82,6 +82,8 @@ export default function Home() {
 /** Up to 12 best-rated products in a row that scrolls sideways (four visible on desktop). */
 function BestSellers() {
   const [products, setProducts] = useState(null)
+  const row = useRef(null)
+  const scroll = (dir) => row.current?.scrollBy({ left: dir * row.current.clientWidth * 0.8, behavior: 'smooth' })
 
   useEffect(() => {
     api('/products?sort=rating').then((list) => setProducts(list.slice(0, 12))).catch(() => setProducts([]))
@@ -93,11 +95,28 @@ function BestSellers() {
     <section className="mx-auto max-w-6xl px-4 pt-20">
       <div className="mb-6 flex items-baseline justify-between gap-4">
         <h2 className="text-2xl font-bold uppercase">Best for sale</h2>
-        <a href="#shop" className="text-sm text-brand underline underline-offset-2 hover:text-brand-dark">
-          View all
-        </a>
+        <div className="flex items-center gap-3">
+          <a href="#shop" className="text-sm text-brand underline underline-offset-2 hover:text-brand-dark">
+            View all
+          </a>
+          {[['Previous', -1, 'm15 18-6-6 6-6'], ['Next', 1, 'm9 18 6-6-6-6']].map(([label, dir, d]) => (
+            <button
+              key={label}
+              onClick={() => scroll(dir)}
+              aria-label={`${label} products`}
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-neutral-300 transition hover:border-brand hover:text-brand sm:flex"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <path d={d} />
+              </svg>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-4 lg:gap-6">
+      <div
+        ref={row}
+        className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 [scrollbar-width:none] lg:gap-6 [&::-webkit-scrollbar]:hidden"
+      >
         {products?.map((p) => (
           <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-18px)]">
             <ProductCard product={p} />
