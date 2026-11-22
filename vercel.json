@@ -3,6 +3,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "https://129-225-119-92.sslip.io/api/zuno/sitemap.xml"
+    },
+    {
       "source": "/api/zuno/:path*",
       "destination": "https://129-225-119-92.sslip.io/api/zuno/:path*"
     },

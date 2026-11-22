@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /cart
+Disallow: /account
+Disallow: /orders
+Disallow: /wishlist
+Disallow: /search
+Disallow: /api/
+
+Sitemap: https://zunostore.in/sitemap.xml
