@@ -6,4 +6,4 @@ Disallow: /wishlist
 Disallow: /search
 Disallow: /api/
 
-Sitemap: https://zunostore.in/sitemap.xml
+Sitemap: https://www.zunostore.in/sitemap.xml

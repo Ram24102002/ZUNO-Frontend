@@ -176,7 +176,7 @@ export default function Navbar() {
         </div>
 
         {/* Center: logo */}
-        <Link to="/" aria-label="ZUNO home" className="justify-self-center"><Logo wordmarkClass="font-['Exo_2'] font-bold italic" /></Link>
+        <Link to="/" aria-label="ZUNO home" className="justify-self-center logo-weight"><Logo wordmarkClass="font-['Exo_2'] font-bold italic" /></Link>
 
         {/* Right: search + account + wishlist + cart */}
         <div className="flex items-center justify-end gap-4 sm:gap-6">
