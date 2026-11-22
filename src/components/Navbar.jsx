@@ -6,7 +6,6 @@ import { useCart } from '../cart'
 import { useAccount } from '../account'
 import { useWishlist } from '../wishlist'
 import { HeartIcon } from './HeartButton'
-import ImageSearchButton from './ImageSearchButton'
 
 // Left-side links. Men/Women filter the shop by category slug.
 const LINKS = [
@@ -232,9 +231,8 @@ export default function Navbar() {
                 onChange={(e) => setTerm(e.target.value)}
                 tabIndex={searchOpen ? 0 : -1}
                 placeholder="Search tees, hoodies, colours…"
-                className="w-full rounded-full border-2 border-neutral-200 py-2.5 pr-12 pl-11 outline-none focus:border-brand"
+                className="w-full rounded-full border-2 border-neutral-200 py-2.5 pr-4 pl-11 outline-none focus:border-brand"
               />
-              <ImageSearchButton className="absolute top-1/2 right-4 -translate-y-1/2" tabIndex={searchOpen ? 0 : -1} />
             </label>
             <button type="submit" tabIndex={searchOpen ? 0 : -1} className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90">
               Search
@@ -285,9 +283,8 @@ export default function Navbar() {
               value={drawerTerm}
               onChange={(e) => setDrawerTerm(e.target.value)}
               placeholder="What are you looking for?"
-              className="w-full rounded-full border-2 border-neutral-200 py-2.5 pr-12 pl-11 outline-none focus:border-brand"
+              className="w-full rounded-full border-2 border-neutral-200 py-2.5 pr-4 pl-11 outline-none focus:border-brand"
             />
-            <ImageSearchButton className="absolute top-1/2 right-4 -translate-y-1/2" tabIndex={open ? 0 : -1} />
           </label>
         </form>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import { api } from '../api'
 
@@ -33,8 +33,6 @@ export default function Search() {
   const [products, setProducts] = useState(null)
   const [error, setError] = useState(null)
   const [showFilters, setShowFilters] = useState(false) // mobile drawer
-  // Set when we got here from the camera button; changing a filter drops it
-  const imageSearch = useLocation().state?.imageSearch
 
   const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, params.get(k) ?? '']))
   const filterString = new URLSearchParams(Object.entries(filters).filter(([, v]) => v)).toString()
@@ -137,18 +135,8 @@ export default function Search() {
       <div className="mb-8">
         <p className="text-sm font-bold uppercase tracking-[0.3em] text-brand">Search</p>
         <h1 className="display mt-2 text-3xl sm:text-4xl">
-          {imageSearch ? 'Similar to your photo' : filters.q ? <>Results for “<span className="text-brand">{filters.q}</span>”</> : 'All products'}
+          {filters.q ? <>Results for “<span className="text-brand">{filters.q}</span>”</> : 'All products'}
         </h1>
-        {imageSearch && (
-          <div className="mt-5 flex items-center gap-4 rounded-2xl bg-neutral-50 p-3 pr-5">
-            <img src={imageSearch.preview} alt="Your photo" onError={(e) => { e.currentTarget.style.display = 'none' }} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
-            <p className="text-sm text-ink/70">
-              {imageSearch.q || imageSearch.color
-                ? <>We spotted: <span className="font-semibold text-ink">{[imageSearch.color, imageSearch.q].filter(Boolean).join(' ')}</span></>
-                : 'We couldn’t recognise clothing in that photo, so here’s everything.'}
-            </p>
-          </div>
-        )}
       </div>
 
       <div className="flex gap-10">
