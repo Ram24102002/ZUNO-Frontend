@@ -1,101 +1,121 @@
 import { Link } from 'react-router-dom'
-import { INSTAGRAM_URL } from '../config'
-import Logo from './Logo'
+import { INSTAGRAM_URL, YOUTUBE_URL } from '../config'
 
-// Link columns. `href` = external, `to` = page in the shop.
-const COLUMNS = [
+const LINK_GROUPS = [
+  {
+    title: 'Shop',
+    links: [
+      { label: 'All', to: '/' },
+      { label: 'Women', to: '/shop-women' },
+      { label: 'Men', to: '/shop-men' },
+    ],
+  },
   {
     title: 'Help',
     links: [
-      { label: 'Contact Us', to: '/contact' },
-      { label: 'Track Your Order', to: '/orders' },
-      { label: 'Your Cart', to: '/cart' },
-    ],
-  },
-  {
-    title: 'My Account',
-    links: [
-      { label: 'Login', to: '/account' },
-      { label: 'Orders', to: '/orders' },
-      { label: 'Wishlist', to: '/wishlist' },
-    ],
-  },
-  {
-    title: 'Pages',
-    links: [
-      { label: 'Shop All', to: '/' },
-      { label: 'Women', to: '/shop-women' },
-      { label: 'Men', to: '/shop-men' },
-      { label: 'Create Your Own', to: '/design' },
-      { label: 'About Us', to: '/about' },
+      { label: 'Track Order', to: '/orders' },
       { label: 'Contact', to: '/contact' },
+    ],
+  },
+  {
+    title: 'ZUNO',
+    links: [
+      { label: 'About', to: '/about' },
+      { label: 'Create Your Own', to: '/design' },
+    ],
+  },
+  {
+    title: 'Social',
+    links: [
+      { label: 'Instagram', href: INSTAGRAM_URL, Icon: InstagramIcon },
+      { label: 'YouTube', href: YOUTUBE_URL, Icon: YouTubeIcon },
     ],
   },
 ]
 
-const PAYMENTS = ['UPI', 'Cards', 'Net Banking', 'Razorpay', 'COD']
+const PAYMENT_METHODS = ['UPI', 'Visa', 'Mastercard', 'RuPay', 'Net Banking', 'Wallets']
 
-const linkClass = 'text-sm text-ink/60 transition hover:text-brand'
+const MARQUEE =['Wear the Mindset', 'Design Your Own Tee', 'Fresh Drops', 'Built Different', '@zuno.clo']
 
-function FooterLink({ label, to, href }) {
-  return href
-    ? <a href={href} target="_blank" rel="noreferrer" className={linkClass}>{label}</a>
-    : <Link to={to} className={linkClass}>{label}</Link>
+function MarqueeRow() {
+  return (
+    <div className="flex shrink-0 items-center gap-8 pr-8" aria-hidden="true">
+      {MARQUEE.map((t) => (
+        <span key={t} className="flex items-center gap-8 whitespace-nowrap">
+          {t}
+          <span className="text-brand">✦</span>
+        </span>
+      ))}
+    </div>
+  )
 }
 
 export default function Footer() {
   return (
-    <footer className="border-t border-neutral-200 bg-neutral-50">
-      <div className="grid gap-10 px-4 py-12 sm:px-10 md:grid-cols-[1fr_1fr_1fr_1.5fr]">
-        {COLUMNS.map((col) => (
-          <div key={col.title}>
-            <p className="text-sm font-bold">{col.title}</p>
-            <ul className="mt-4 space-y-2.5">
-              {col.links.map((l) => <li key={l.label}><FooterLink {...l} /></li>)}
-            </ul>
-          </div>
-        ))}
-
-        <div>
-          <p className="text-sm font-bold">More About ZUNO</p>
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            <Link to="/about" className="group bg-white transition hover:shadow-md">
-              <div className="flex h-20 items-center justify-center"><Logo /></div>
-              <p className="bg-neutral-100 p-3 text-xs font-semibold">Our Story</p>
-            </Link>
-            <Link to="/design" className="group bg-white transition hover:shadow-md">
-              <div className="flex h-20 items-center justify-center text-ink/80">
-                <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                </svg>
-              </div>
-              <p className="bg-neutral-100 p-3 text-xs font-semibold">Design Your Tee</p>
-            </Link>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="group bg-white transition hover:shadow-md">
-              <div className="flex h-20 items-center justify-center text-ink/80">
-                <InstagramIcon className="h-7 w-7" />
-              </div>
-              <p className="bg-neutral-100 p-3 text-xs font-semibold">@zuno.clo</p>
-            </a>
-          </div>
+    <footer className="bg-ink text-white">
+      {/* Marquee band */}
+      <div className="group overflow-hidden border-y border-white/10 bg-brand py-3 text-sm font-black uppercase italic tracking-wider text-white">
+        <div className="flex w-max animate-[footer-marquee_30s_linear_infinite] group-hover:[animation-play-state:paused] motion-reduce:animate-none [&_.text-brand]:text-white/60">
+          <MarqueeRow /><MarqueeRow />
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 px-4 pb-8 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-        <div className="flex flex-wrap gap-2">
-          {PAYMENTS.map((p) => (
-            <span key={p} className="rounded border border-neutral-300 bg-white px-2 py-1 text-[11px] font-bold text-ink/70">{p}</span>
-          ))}
+      <div className="px-4 pt-14 pb-8 sm:px-10">
+        <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-6xl font-black uppercase italic leading-none tracking-tighter sm:text-8xl">
+              ZUNO<span className="text-brand">.</span>
+            </p>
+            <p className="mt-3 text-sm text-white/50">Wear the Mindset.</p>
+          </div>
+
+          <nav className="grid grid-cols-2 gap-x-12 gap-y-8 sm:grid-cols-4" aria-label="Footer">
+            {LINK_GROUPS.map((g) => (
+              <div key={g.title}>
+                <p className="mb-4 text-xs font-black uppercase italic tracking-widest text-brand">{g.title}</p>
+                <ul className="space-y-2.5">
+                  {g.links.map((l) => {
+                    const cls = 'group/link inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-white'
+                    const arrow = <span className="-translate-x-1 text-brand opacity-0 transition group-hover/link:translate-x-0 group-hover/link:opacity-100">→</span>
+                    return (
+                      <li key={l.label}>
+                        {l.href ? (
+                          <a href={l.href} target="_blank" rel="noreferrer" className={cls}>
+                            {l.Icon && <l.Icon className="h-4 w-4 shrink-0 transition group-hover/link:text-brand" />}
+                            {l.label}
+                            {arrow}
+                          </a>
+                        ) : (
+                          <Link to={l.to} className={cls}>
+                            {l.label}
+                            {arrow}
+                          </Link>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+          </nav>
         </div>
-        <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="ZUNO on Instagram" className="text-ink/80 transition hover:text-brand">
-          <InstagramIcon className="h-6 w-6" />
-        </a>
+
+        <div className="mt-12 flex flex-col-reverse gap-4 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} ZUNO. All rights reserved. · Secure payments via Razorpay</p>
+          <ul className="flex flex-wrap gap-2" aria-label="Accepted payment methods">
+            {PAYMENT_METHODS.map((m) => (
+              <li
+                key={m}
+                className="rounded border border-white/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/70"
+              >
+                {m}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-neutral-200 px-4 py-5 text-xs text-ink/60 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-        <p>© {new Date().getFullYear()} ZUNO | All Rights Reserved. | Wear the Mindset.</p>
-        <Link to="/about" className="underline underline-offset-2 hover:text-brand">Website</Link>
-      </div>
+      <style>{'@keyframes footer-marquee{to{transform:translateX(-50%)}}'}</style>
     </footer>
   )
 }
@@ -106,6 +126,15 @@ function InstagramIcon({ className }) {
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+    </svg>
+  )
+}
+
+function YouTubeIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="4" />
+      <path d="M10 9.5v5l4.5-2.5z" fill="currentColor" />
     </svg>
   )
 }
