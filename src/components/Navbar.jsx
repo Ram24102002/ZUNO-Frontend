@@ -200,7 +200,7 @@ export default function Navbar() {
             <span className="relative block">
               <HeartIcon className="h-6 w-6" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{wishlistCount}</span>
+                <span key={wishlistCount} className="pop absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{wishlistCount}</span>
               )}
             </span>
           </NavLink>
@@ -211,7 +211,7 @@ export default function Navbar() {
                 <path d="M9 8V6a3 3 0 0 1 6 0v2" />
               </svg>
               {count > 0 && (
-                <span className="absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{count}</span>
+                <span key={count} className="pop absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{count}</span>
               )}
             </span>
           </NavLink>
@@ -255,7 +255,7 @@ export default function Navbar() {
       aria-modal="true"
       aria-label="Menu"
       inert={!open}
-      className={`fixed inset-0 z-50 flex flex-col bg-white transition-transform duration-300 md:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed inset-0 z-50 flex flex-col bg-white transition-transform duration-300 ease-[cubic-bezier(0.2,0.7,0.2,1)] md:hidden ${open ? 'drawer-open translate-x-0' : '-translate-x-full'}`}
     >
       {/* Top row: close + wishlist */}
       <div className="flex items-center justify-between px-4 py-3">
@@ -268,7 +268,7 @@ export default function Navbar() {
           <span className="relative block">
             <HeartIcon className="h-6 w-6" />
             {wishlistCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{wishlistCount}</span>
+              <span key={wishlistCount} className="pop absolute -top-1.5 -right-2 rounded-full bg-brand px-1.5 text-[10px] leading-4 text-white">{wishlistCount}</span>
             )}
           </span>
         </NavLink>
@@ -276,7 +276,7 @@ export default function Navbar() {
 
       <div className="flex-1 overflow-y-auto">
         {/* Search */}
-        <form onSubmit={submitDrawerSearch} role="search" className="px-4">
+        <form onSubmit={submitDrawerSearch} role="search" className="drawer-item px-4" style={{ '--i': 0 }}>
           <label className="relative block">
             <span className="sr-only">Search products</span>
             <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-ink/40"><SearchIcon className="h-5 w-5" /></span>
@@ -292,7 +292,7 @@ export default function Navbar() {
         </form>
 
         {/* Tabs */}
-        <div role="tablist" className="mx-4 mt-5 flex gap-6 border-b border-neutral-200">
+        <div role="tablist" className="drawer-item mx-4 mt-5 flex gap-6 border-b border-neutral-200" style={{ '--i': 1 }}>
           {Object.entries(MENU).map(([key, m]) => (
             <button
               key={key}
@@ -310,21 +310,23 @@ export default function Navbar() {
         </div>
 
         {/* Swipeable image cards */}
-        <div className="mt-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
+        <div className="drawer-item" style={{ '--i': 2 }}>
+        <div key={tab} className="fade-in mt-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
           {MENU[tab].cards.map((c) => (
-            <Link key={c.label} to={c.to} className="relative block aspect-[4/5] w-[75%] shrink-0 snap-start overflow-hidden rounded-lg bg-neutral-100">
+            <Link key={c.label} to={c.to} className="relative block aspect-[4/5] w-[75%] shrink-0 snap-start overflow-hidden rounded-lg bg-neutral-100 transition active:scale-[0.97]">
               <img src={c.img} alt="" loading="lazy" className="h-full w-full object-cover" />
               <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0" />
               <span className="absolute bottom-4 left-4 text-lg font-bold uppercase tracking-wide text-white">{c.label}</span>
             </Link>
           ))}
         </div>
+        </div>
 
         {/* Link list */}
-        <ul className="mt-4 px-4">
+        <ul key={tab} className="fade-in drawer-item mt-4 px-4" style={{ '--i': 3 }}>
           {MENU[tab].links.map((l) => (
             <li key={l.to + l.label}>
-              <Link to={l.to} className="flex items-center justify-between py-3.5 font-semibold text-ink hover:text-brand">
+              <Link to={l.to} className="flex items-center justify-between py-3.5 font-semibold text-ink transition hover:text-brand active:translate-x-1">
                 {l.label}
                 <Chevron />
               </Link>
@@ -339,7 +341,7 @@ export default function Navbar() {
         </ul>
 
         {/* Secondary links */}
-        <ul className="mt-4 border-t border-neutral-200 px-4 py-4">
+        <ul className="drawer-item mt-4 border-t border-neutral-200 px-4 py-4" style={{ '--i': 4 }}>
           {SECONDARY.map((l) => (
             <li key={l.to}>
               <Link to={l.to} className="block py-2 text-sm text-ink/70 hover:text-brand">{l.label}</Link>

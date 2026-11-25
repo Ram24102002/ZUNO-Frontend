@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 // The cart lives in the browser. Each line is
 // { key, productId, name, color, size, quantity, unitPrice, image, design? }
@@ -17,6 +17,8 @@ function loadSaved() {
 
 export function CartProvider({ children }) {
   const [lines, setLines] = useState(loadSaved)
+  const [lastAdded, setLastAdded] = useState(null) // { ...line, at } for the "Added to bag" sheet
+  const dismissAdded = useCallback(() => setLastAdded(null), [])
 
   useEffect(() => {
     try {
@@ -27,7 +29,8 @@ export function CartProvider({ children }) {
   }, [lines])
 
   const value = useMemo(() => {
-    const add = (line) =>
+    const add = (line) => {
+      setLastAdded({ ...line, at: Date.now() })
       setLines((current) => {
         // The same product, colour and size is one line with a higher quantity; every custom tee is its own line
         const same = !line.design && current.find(
@@ -36,6 +39,7 @@ export function CartProvider({ children }) {
         if (!same) return [...current, { ...line, key: crypto.randomUUID(), quantity: line.quantity ?? 1 }]
         return current.map((l) => (l === same ? { ...l, quantity: Math.min(MAX_QUANTITY, l.quantity + 1) } : l))
       })
+    }
     const setQuantity = (key, quantity) =>
       setLines((current) =>
         current.map((l) => (l.key === key ? { ...l, quantity: Math.max(1, Math.min(MAX_QUANTITY, quantity)) } : l)),
@@ -48,10 +52,12 @@ export function CartProvider({ children }) {
       setQuantity,
       remove,
       clear,
+      lastAdded,
+      dismissAdded,
       count: lines.reduce((sum, l) => sum + l.quantity, 0),
       total: lines.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0),
     }
-  }, [lines])
+  }, [lines, lastAdded, dismissAdded])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

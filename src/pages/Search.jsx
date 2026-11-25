@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
+import { CardSkeletons } from '../components/Skeleton'
 import { api } from '../api'
 
 const SORTS = [
@@ -191,6 +192,7 @@ export default function Search() {
             </div>
           )}
           <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+            {!products && !error && <CardSkeletons count={6} />}
             {products?.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>

@@ -5,6 +5,8 @@ import { ClawMark } from '../components/Logo'
 import Lookbook from '../components/Lookbook'
 import DropHero from '../components/DropHero'
 import ProductCard from '../components/ProductCard'
+import Reveal from '../components/Reveal'
+import { CardSkeleton } from '../components/Skeleton'
 import { api } from '../api'
 
 export default function Home() {
@@ -18,10 +20,10 @@ export default function Home() {
           <h1 className="display text-5xl text-ink sm:text-7xl lg:text-8xl">
             Wear your <span className="text-brand">mindset.</span>
           </h1>
-          <p className="mt-6 text-sm text-ink/80 sm:text-base">Limited stock. No restocks.</p>
+          <p className="mt-6 text-sm text-ink/80 sm:text-base">Train in it. Live in it.</p>
           <a
             href="#shop"
-            className="mt-8 inline-block rounded-full bg-brand px-10 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark"
+            className="mt-8 inline-block rounded-full bg-brand px-10 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark active:scale-95"
           >
             Shop drop
           </a>
@@ -29,6 +31,7 @@ export default function Home() {
       </section>
 
       {/* Design your own tee */}
+      <Reveal>
       <section className="mx-auto max-w-6xl px-4 pb-20">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand to-brand-dark px-6 py-14 text-center text-white sm:px-12 sm:text-left">
           <div className="relative flex flex-col items-center gap-8 sm:flex-row sm:justify-between">
@@ -43,21 +46,23 @@ export default function Home() {
             </div>
             <Link
               to="/design"
-              className="shrink-0 rounded-full bg-white px-8 py-3 text-sm font-semibold uppercase tracking-wider text-brand-dark shadow-lg transition hover:bg-brand-light"
+              className="shrink-0 rounded-full bg-white px-8 py-3 text-sm font-semibold uppercase tracking-wider text-brand-dark shadow-lg transition hover:bg-brand-light active:scale-95"
             >
               Start designing
             </Link>
           </div>
         </div>
       </section>
+      </Reveal>
 
-      <DropHero />
+      <Reveal><DropHero /></Reveal>
 
-      <BestSellers />
+      <Reveal><BestSellers /></Reveal>
 
-      <Shop title={<>Current <span className="text-brand">Drop</span></>} compact />
+      <Reveal><Shop title={<>Current <span className="text-brand">Drop</span></>} compact /></Reveal>
 
       {/* Brand statement */}
+      <Reveal>
       <section className="relative overflow-hidden py-24 text-center">
         <ClawMark className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 opacity-10" />
         <div className="relative mx-auto max-w-3xl px-4">
@@ -73,8 +78,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+      </Reveal>
 
-      <Lookbook />
+      <Reveal><Lookbook /></Reveal>
     </>
   )
 }
@@ -117,9 +123,12 @@ function BestSellers() {
         ref={row}
         className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 [scrollbar-width:none] lg:gap-6 [&::-webkit-scrollbar]:hidden"
       >
+        {!products && [0, 1, 2, 3].map((i) => (
+          <div key={i} className="w-[46%] shrink-0 sm:w-[31%] lg:w-[calc(25%-18px)]"><CardSkeleton /></div>
+        ))}
         {products?.map((p) => (
           <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-18px)]">
-            <ProductCard product={p} />
+            <ProductCard product={p} swipe={false} />
           </div>
         ))}
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from './ProductCard'
+import { CardSkeletons } from './Skeleton'
 import { api } from '../api'
 
 const SORTS = [
@@ -168,6 +169,7 @@ export default function Shop({ title = <>The <span className="text-brand">Collec
         </div>
       )}
       <div className={compact ? 'grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4 lg:gap-6' : 'grid gap-8 sm:grid-cols-2 lg:grid-cols-3'}>
+        {!products && !error && <CardSkeletons count={compact ? 4 : 6} />}
         {products?.map((p) => <ProductCard key={p.id} product={p} />)}
       </div>
     </section>

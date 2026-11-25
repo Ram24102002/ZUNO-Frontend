@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
+import TabBar from './components/TabBar'
+import AddedSheet from './components/AddedSheet'
 import Home from './pages/Home'
 import Product from './pages/Product'
 import About from './pages/About'
@@ -22,11 +24,13 @@ const Design = lazy(() => import('./pages/Design'))
 const loading = <p className="py-24 text-center text-ink/50">Loading…</p>
 
 export default function App() {
+  const { pathname } = useLocation()
   return (
     <div className="flex min-h-screen flex-col">
       <ScrollToTop />
       <Navbar />
-      <main className="flex-1">
+      {/* Keyed by page so the entrance animation replays on each navigation */}
+      <main key={pathname} className="page-enter flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<Product />} />
@@ -45,6 +49,8 @@ export default function App() {
           <Route path="*" element={<NotFound />} />        </Routes>
       </main>
       <Footer />
+      <TabBar />
+      <AddedSheet />
     </div>
   )
 }

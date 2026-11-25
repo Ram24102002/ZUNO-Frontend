@@ -3,15 +3,23 @@ import ProductImage from './ProductImage'
 import HeartButton from './HeartButton'
 import { Stars } from './Stars'
 
-export default function ProductCard({ product }) {
+/** `swipe`: on phones, slide sideways to the second photo. Turn off inside rows that already scroll sideways. */
+export default function ProductCard({ product, swipe = true }) {
   const hoverImage = product.images?.[1]
   const to = `/product/${product.id}`
 
   return (
     <div className="group">
       <div className="relative">
-        <Link to={to} className="block overflow-hidden rounded-2xl" tabIndex={-1} aria-hidden="true">
-          <div className="relative">
+        <Link to={to} className="block overflow-hidden rounded-2xl transition duration-200 active:scale-[0.97]" tabIndex={-1} aria-hidden="true">
+          {/* Phones: swipe to the second photo (hover does nothing on touch) */}
+          {swipe && hoverImage && (
+            <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+              <ProductImage product={product} className="aspect-[4/5] shrink-0 snap-center" />
+              <ProductImage product={product} src={hoverImage} className="aspect-[4/5] shrink-0 snap-center" />
+            </div>
+          )}
+          <div className={`relative ${swipe && hoverImage ? 'hidden md:block' : ''}`}>
             <ProductImage product={product} className="aspect-[4/5] transition duration-500 group-hover:scale-105" />
             {/* Second photo fades in on hover */}
             {hoverImage && (
