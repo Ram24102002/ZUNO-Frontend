@@ -4,6 +4,7 @@ import { useCart } from '../cart'
 import { useAccount } from '../account'
 import { api } from '../api'
 import { AddressFields } from '../components/AddressForm'
+import { ClawMark } from '../components/Logo'
 
 const inputClass = 'mt-1 w-full rounded-lg border-2 border-neutral-200 px-4 py-2.5 outline-none focus:border-brand'
 const labelClass = 'block text-sm font-semibold'
@@ -43,16 +44,67 @@ const collectPayment = async (checkout, customer) => {
 const linesForServer = (lines) => lines.map(({ productId, color, size, quantity, design }) => ({ productId, color, size, quantity, design }))
 
 const whatsappOrderUrl = (order, lines) => {
+  const divider = '──────────────'
+
+  const itemLines = lines.map(
+    (line, i) =>
+      `${i + 1}. *${line.name}*\n    ${line.color} • ${line.size} • Qty ${line.quantity}`
+  )
+
   const message = [
-    'Hi, I just placed an order with ZUNO.',
-    `Order number: #${order.id}`,
-    'Items:',
-    ...lines.map((line) => `- ${line.name} · ${line.color}, size ${line.size} · Qty ${line.quantity}`),
-    `Total: ₹${order.total}`,
-    `Payment: ${order.paid ? 'Paid online' : 'Cash on delivery'}`,
+    `🛍️ *New ZUNO Order*`,
+    divider,
+    `🧾 *Order:* #${order.id}`,
+    '',
+    `📦 *Items*`,
+    ...itemLines,
+    divider,
+    `💵 *Total:* ₹${Number(order.total).toLocaleString('en-IN')}`,
+    `*Payment:* ${order.paid ? 'Paid online' : 'Cash on delivery'}`,
+    divider,
+    `Hi ZUNO team, I just placed this order. Please confirm!`,
   ].join('\n')
 
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+  return `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`
+}
+
+function OrderLoading({ confirmingPayment }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      className="fixed inset-0 z-[100] grid min-h-[100dvh] place-items-center overflow-hidden bg-gradient-to-br from-brand-light via-white to-white px-5"
+    >
+      <div aria-hidden="true" className="absolute -left-20 top-1/4 h-56 w-56 rounded-full bg-brand/10 blur-3xl" />
+      <div aria-hidden="true" className="absolute -right-20 bottom-1/4 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
+
+      <div className="relative flex w-full max-w-sm flex-col items-center rounded-3xl border border-brand/10 bg-white/90 px-7 py-10 text-center shadow-[0_24px_80px_rgba(29,155,240,0.12)] backdrop-blur">
+        <div className="relative flex h-32 w-32 items-center justify-center">
+          <span className="absolute inset-0 rounded-full border border-brand/20" />
+          <span className="absolute inset-0 rounded-full border-2 border-transparent border-r-brand/70 border-t-brand animate-spin motion-reduce:animate-none" />
+          <span className="absolute inset-3 rounded-full border border-brand/15" />
+          <span className="absolute inset-3 rounded-full border-2 border-transparent border-b-brand/60 animate-[spin_2.8s_linear_infinite_reverse] motion-reduce:animate-none" />
+          <span className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white shadow-[0_8px_30px_rgba(29,155,240,0.18)]">
+            <ClawMark className="h-10 w-10 animate-pulse motion-reduce:animate-none" />
+          </span>
+        </div>
+
+        <h1 className="display mt-8 text-3xl leading-none">
+          {confirmingPayment ? <>Securing your <span className="text-brand">order</span></> : <>Placing your <span className="text-brand">order</span></>}
+        </h1>
+        <p className="mt-3 text-sm text-ink/60">
+          {confirmingPayment ? 'Payment received. Confirming your order…' : 'Hang tight while we confirm everything.'}
+        </p>
+        <div aria-hidden="true" className="mt-6 flex items-center gap-1.5">
+          <span className="h-2 w-2 animate-bounce rounded-full bg-brand motion-reduce:animate-none" />
+          <span className="h-2 w-2 animate-bounce rounded-full bg-brand/70 [animation-delay:120ms] motion-reduce:animate-none" />
+          <span className="h-2 w-2 animate-bounce rounded-full bg-brand/40 [animation-delay:240ms] motion-reduce:animate-none" />
+        </div>
+        <p className="mt-5 text-xs font-medium uppercase tracking-[0.18em] text-ink/40">Please keep this page open</p>
+      </div>
+    </div>
+  )
 }
 
 function CartLine({ line, locked }) {
@@ -273,6 +325,10 @@ export default function Cart() {
   const cancelPayment = () => {
     setPending(null)
     setError(null)
+  }
+
+  if (busy && (!pending || payment)) {
+    return <OrderLoading confirmingPayment={Boolean(payment)} />
   }
 
   if (order) {
