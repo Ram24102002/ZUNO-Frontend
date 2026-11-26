@@ -60,10 +60,14 @@ const Chevron = () => (
   </svg>
 )
 
-const textClass = (active) =>
-  `text-xs font-semibold uppercase tracking-wider transition ${
-    active ? 'text-brand' : 'text-ink/70 hover:text-brand'
-  }`
+// Pages whose hero sits under a see-through navbar while scrolled to the top.
+// 'dark' heroes need white nav text; 'light' ones keep the normal colours.
+const HERO_PAGES = { '/': 'light', '/shop-men': 'dark', '/shop-women': 'dark', '/contact': 'dark' }
+
+const idle = (dark) => (dark ? 'text-white/90 hover:text-white' : 'text-ink/70 hover:text-brand')
+
+const textClass = (active, dark = false) =>
+  `text-xs font-semibold uppercase tracking-wider transition ${active ? 'text-brand' : idle(dark)}`
 
 const SearchIcon = ({ className = 'h-6 w-6' }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -72,7 +76,7 @@ const SearchIcon = ({ className = 'h-6 w-6' }) => (
   </svg>
 )
 
-const iconClass =({ isActive }) => `transition ${isActive ? 'text-brand' : 'text-ink/70 hover:text-brand'}`
+const iconClass = (dark = false) => ({ isActive }) => `transition ${isActive ? 'text-brand' : idle(dark)}`
 
 /** True when the current URL matches a link, including its ?query part. */
 function useIsActive() {
@@ -101,6 +105,27 @@ export default function Navbar() {
 
   const [tab, setTab] = useState('men')
   const [drawerTerm, setDrawerTerm] = useState('')
+
+  // Transparent over the hero while at the very top of a hero page
+  const [atTop, setAtTop] = useState(true)
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  const hero = HERO_PAGES[location.pathname]
+  const clear = Boolean(hero) && atTop && !searchOpen
+  const dark = clear && hero === 'dark'
+
+  // Share the nav's height so hero pages can slide up underneath it (see .under-nav in index.css)
+  const navRef = useRef(null)
+  useEffect(() => {
+    const el = navRef.current
+    const ro = new ResizeObserver(() => document.documentElement.style.setProperty('--nav-h', `${el.offsetHeight}px`))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Close the mobile menu and search bar after navigating
   useEffect(() => { setOpen(false); setSearchOpen(false) }, [location.pathname, location.search])
@@ -143,15 +168,15 @@ export default function Navbar() {
 
   return (
     <>
-    <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/90 backdrop-blur">
+    <header className={`sticky top-0 z-10 border-b transition-colors duration-300 ${clear ? 'border-transparent bg-transparent' : 'border-neutral-200 bg-white/90 backdrop-blur'}`}>
       <AnnouncementBar />
-      <nav className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-3 sm:px-6">
+      <nav ref={navRef} className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-3 sm:px-6">
         {/* Left: links (desktop) / menu + search buttons (mobile) */}
         <div className="flex items-center gap-4 md:gap-6">
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="text-ink/70 hover:text-brand md:hidden"
+            className={`md:hidden transition ${idle(dark)}`}
             aria-label="Open menu"
             aria-expanded={open}
             aria-controls="mobile-menu"
@@ -163,7 +188,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen((o) => !o)}
-            className={`md:hidden transition ${searchOpen || location.pathname === '/search' ? 'text-brand' : 'text-ink/70 hover:text-brand'}`}
+            className={`md:hidden transition ${searchOpen || location.pathname === '/search' ? 'text-brand' : idle(dark)}`}
             aria-label={searchOpen ? 'Close search' : 'Search products'}
             aria-expanded={searchOpen}
           >
@@ -171,32 +196,32 @@ export default function Navbar() {
           </button>
           <div className="hidden items-center gap-6 md:flex">
             {LINKS.map((l) => (
-              <Link key={l.to} to={l.to} className={textClass(isActive(l.to))}>{l.label}</Link>
+              <Link key={l.to} to={l.to} className={textClass(isActive(l.to), dark)}>{l.label}</Link>
             ))}
           </div>
         </div>
 
         {/* Center: logo */}
-        <Link to="/" aria-label="ZUNO home" className="justify-self-center logo-weight"><Logo wordmarkClass="font-['Exo_2'] font-bold italic" /></Link>
+        <Link to="/" aria-label="ZUNO home" className="justify-self-center logo-weight"><Logo wordmarkClass={`font-['Exo_2'] font-bold italic transition-colors ${dark ? 'text-white!' : ''}`} /></Link>
 
         {/* Right: search + account + wishlist + cart */}
         <div className="flex items-center justify-end gap-4 sm:gap-6">
           <button
             type="button"
             onClick={() => setSearchOpen((o) => !o)}
-            className={`hidden md:block transition ${searchOpen || location.pathname === '/search' ? 'text-brand' : 'text-ink/70 hover:text-brand'}`}
+            className={`hidden md:block transition ${searchOpen || location.pathname === '/search' ? 'text-brand' : idle(dark)}`}
             aria-label={searchOpen ? 'Close search' : 'Search products'}
             aria-expanded={searchOpen}
           >
             <SearchIcon />
           </button>
-          <NavLink to="/account" className={iconClass} aria-label={customer ? `Your account, ${customer.firstName}` : 'Log in'}>
+          <NavLink to="/account" className={iconClass(dark)} aria-label={customer ? `Your account, ${customer.firstName}` : 'Log in'}>
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="8" r="4" />
               <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
             </svg>
           </NavLink>
-          <NavLink to="/wishlist" className={(s) => `hidden md:block ${iconClass(s)}`} aria-label={`Wishlist, ${wishlistCount} items`}>
+          <NavLink to="/wishlist" className={(s) => `hidden md:block ${iconClass(dark)(s)}`} aria-label={`Wishlist, ${wishlistCount} items`}>
             <span className="relative block">
               <HeartIcon className="h-6 w-6" />
               {wishlistCount > 0 && (
@@ -204,7 +229,7 @@ export default function Navbar() {
               )}
             </span>
           </NavLink>
-          <NavLink to="/cart" className={iconClass} aria-label={`Cart, ${count} items`}>
+          <NavLink to="/cart" className={iconClass(dark)} aria-label={`Cart, ${count} items`}>
             <span className="relative block">
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M6 8h12l1 12H5L6 8z" />
@@ -264,7 +289,7 @@ export default function Navbar() {
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
-        <NavLink to="/wishlist" className={iconClass} aria-label={`Wishlist, ${wishlistCount} items`}>
+        <NavLink to="/wishlist" className={iconClass()} aria-label={`Wishlist, ${wishlistCount} items`}>
           <span className="relative block">
             <HeartIcon className="h-6 w-6" />
             {wishlistCount > 0 && (

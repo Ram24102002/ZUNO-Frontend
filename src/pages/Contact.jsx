@@ -79,7 +79,7 @@ export default function Contact() {
   return (
     <>
       {/* Sports-themed hero */}
-      <section className="relative overflow-hidden bg-ink text-white">
+      <section className="under-nav relative overflow-hidden bg-ink text-white">
         <img src="/images/lookbook/gym.webp" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-brand/30" />
         {/* Claw slashes */}

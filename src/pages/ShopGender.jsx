@@ -81,7 +81,7 @@ export default function ShopGender({ gender }) {
   return (
     <>
       {/* Hero banner */}
-      <section className="relative h-[70vh] min-h-[420px] overflow-hidden bg-ink">
+      <section className="under-nav relative h-[70vh] min-h-[420px] overflow-hidden bg-ink">
         <img src={page.hero.img} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative flex h-full flex-col justify-end px-4 pb-12 text-white sm:px-10 sm:pb-16">

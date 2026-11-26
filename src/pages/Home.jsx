@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-light to-white">
+      <section className="under-nav relative overflow-hidden bg-gradient-to-b from-brand-light to-white">
         <ClawMark className="pointer-events-none absolute -top-10 -left-16 h-72 w-72 opacity-15" />
         <ClawMark className="pointer-events-none absolute -right-10 -bottom-16 h-80 w-80 opacity-20" />
         <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-36">

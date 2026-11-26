@@ -21,6 +21,8 @@ import ComingSoon from './pages/ComingSoon'
 
 // The design studio pulls in the canvas library, so it is only loaded when visited
 const Design = lazy(() => import('./pages/Design'))
+// Pages whose hero runs under the transparent navbar (keep in sync with Navbar's HERO_PAGES)
+const HERO_PAGES = new Set(['/', '/shop-men', '/shop-women', '/contact'])
 const loading = <p className="py-24 text-center text-ink/50">Loading…</p>
 
 export default function App() {
@@ -30,7 +32,7 @@ export default function App() {
       <ScrollToTop />
       <Navbar />
       {/* Keyed by page so the entrance animation replays on each navigation */}
-      <main key={pathname} className="page-enter flex-1">
+      <main key={pathname} className={`page-enter flex-1 ${HERO_PAGES.has(pathname) ? 'mt-[calc(-1*var(--nav-h,0px))]' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<Product />} />

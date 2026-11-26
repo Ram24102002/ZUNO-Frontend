@@ -19,6 +19,11 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Hero that sits under the transparent navbar: pad its top by the nav's height */
+.under-nav {
+  padding-top: var(--nav-h, 0px);
+}
+
 /* ---- Motion ----
    Entrance animations use fill-mode "backwards" so no transform is left on the element afterwards
    (a lingering transform would trap position:fixed children). */
