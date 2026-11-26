@@ -46,7 +46,7 @@ export default function ProductCard({ product, swipe = true }) {
       </div>
       <Link to={to} className="mt-3 flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-semibold group-hover:text-brand">{product.name}</h3>
+          <h3 className="text-[11px] font-semibold group-hover:text-brand sm:text-sm">{product.name}</h3>
           <p className="text-sm text-ink/60">
             {product.colors.length > 1 ? `${product.colors.length} colours` : product.colors[0]}
           </p>
@@ -56,7 +56,7 @@ export default function ProductCard({ product, swipe = true }) {
             </p>
           )}
         </div>
-        <p className="font-bold">₹{product.price}</p>
+        <p className="text-lg font-bold">₹{product.price}</p>
       </Link>
     </div>
   )
