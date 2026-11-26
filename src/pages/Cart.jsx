@@ -11,6 +11,7 @@ const primaryButton =
   'w-full rounded-full bg-brand py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark disabled:bg-neutral-300 disabled:shadow-none'
 const EMPTY_ADDRESS = { name: '', phone: '', address: '', city: '', state: '', postcode: '' }
 const NEW_ADDRESS = 'new'
+const WHATSAPP_NUMBER = '917550045966'
 
 const loadRazorpay = () =>
   new Promise((resolve, reject) => {
@@ -40,6 +41,19 @@ const collectPayment = async (checkout, customer) => {
 }
 
 const linesForServer = (lines) => lines.map(({ productId, color, size, quantity, design }) => ({ productId, color, size, quantity, design }))
+
+const whatsappOrderUrl = (order, lines) => {
+  const message = [
+    'Hi, I just placed an order with ZUNO.',
+    `Order number: #${order.id}`,
+    'Items:',
+    ...lines.map((line) => `- ${line.name} · ${line.color}, size ${line.size} · Qty ${line.quantity}`),
+    `Total: ₹${order.total}`,
+    `Payment: ${order.paid ? 'Paid online' : 'Cash on delivery'}`,
+  ].join('\n')
+
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+}
 
 function CartLine({ line, locked }) {
   const { setQuantity, remove } = useCart()
@@ -212,6 +226,7 @@ export default function Cart() {
     setPayment(null)
     setQuote(null)
     clear()
+    window.location.assign(whatsappOrderUrl(placed, lines))
   }
 
   const confirmPayment = async (checkout, signed) => {

@@ -45,7 +45,14 @@ export function CartProvider({ children }) {
         current.map((l) => (l.key === key ? { ...l, quantity: Math.max(1, Math.min(MAX_QUANTITY, quantity)) } : l)),
       )
     const remove = (key) => setLines((current) => current.filter((l) => l.key !== key))
-    const clear = () => setLines([])
+    const clear = () => {
+      setLines([])
+      try {
+        localStorage.removeItem(STORAGE_KEY)
+      } catch {
+        // The cart is still cleared in memory when storage is blocked.
+      }
+    }
     return {
       lines,
       add,
