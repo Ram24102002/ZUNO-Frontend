@@ -13,37 +13,16 @@ const primaryButton =
 const EMPTY_ADDRESS = { name: '', phone: '', address: '', city: '', state: '', postcode: '' }
 const NEW_ADDRESS = 'new'
 const WHATSAPP_NUMBER = '917550045966'
+const PAYMENT_METHODS = [
+  { value: 'upi', label: 'UPI', hint: 'Get a QR code or UPI ID on WhatsApp' },
+  { value: 'cod', label: 'Cash on delivery', hint: 'Pay when your order arrives' },
+]
 
-const loadRazorpay = () =>
-  new Promise((resolve, reject) => {
-    if (window.Razorpay) return resolve()
-    const script = document.createElement('script')
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-    script.onload = resolve
-    script.onerror = () => reject(new Error('Could not load the payment window. Check your connection.'))
-    document.body.appendChild(script)
-  })
-
-/** Opens the Razorpay popup; resolves with Razorpay's signed payment details. */
-const collectPayment = async (checkout, customer) => {
-  await loadRazorpay()
-  return new Promise((resolve, reject) => {
-    new window.Razorpay({
-      key: checkout.razorpay.keyId,
-      order_id: checkout.razorpay.orderId,
-      name: 'ZUNO',
-      description: 'ZUNO order',
-      prefill: { name: customer.name, email: customer.email, contact: customer.phone },
-      theme: { color: '#1d9bf0' },
-      handler: resolve,
-      modal: { ondismiss: () => reject(new Error('Payment was not completed.')) },
-    }).open()
-  })
-}
+const paymentLabel = (method) => PAYMENT_METHODS.find((option) => option.value === method)?.label
 
 const linesForServer = (lines) => lines.map(({ productId, color, size, quantity, design }) => ({ productId, color, size, quantity, design }))
 
-const whatsappOrderUrl = (order, lines) => {
+const whatsappOrderUrl = (order, lines, method) => {
   const divider = '──────────────'
 
   const itemLines = lines.map(
@@ -60,15 +39,17 @@ const whatsappOrderUrl = (order, lines) => {
     ...itemLines,
     divider,
     `💵 *Total:* ₹${Number(order.total).toLocaleString('en-IN')}`,
-    `*Payment:* ${order.paid ? 'Paid online' : 'Cash on delivery'}`,
+    `*Payment:* ${paymentLabel(method)}`,
     divider,
-    `Hi ZUNO team, I just placed this order. Please confirm!`,
+    method === 'upi'
+      ? 'Hi ZUNO team, please send your UPI QR code and UPI ID so I can pay for this order.'
+      : 'Hi ZUNO team, please confirm my cash-on-delivery order.',
   ].join('\n')
 
   return `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`
 }
 
-function OrderLoading({ confirmingPayment }) {
+function OrderLoading() {
   return (
     <div
       role="status"
@@ -91,11 +72,9 @@ function OrderLoading({ confirmingPayment }) {
         </div>
 
         <h1 className="display mt-8 text-3xl leading-none">
-          {confirmingPayment ? <>Securing your <span className="text-brand">order</span></> : <>Placing your <span className="text-brand">order</span></>}
+          Placing your <span className="text-brand">order</span>
         </h1>
-        <p className="mt-3 text-sm text-ink/60">
-          {confirmingPayment ? 'Payment received. Confirming your order…' : 'Hang tight while we confirm everything.'}
-        </p>
+        <p className="mt-3 text-sm text-ink/60">Hang tight while we confirm everything.</p>
         <div aria-hidden="true" className="mt-6 flex items-center gap-1.5">
           <span className="h-2 w-2 animate-bounce rounded-full bg-brand motion-reduce:animate-none" />
           <span className="h-2 w-2 animate-bounce rounded-full bg-brand/70 [animation-delay:120ms] motion-reduce:animate-none" />
@@ -218,19 +197,10 @@ export default function Cart() {
   const [quote, setQuote] = useState(null) // { subtotal, discount, total, coupon } while a coupon is applied
   // While a coupon is being checked the order must wait, or it would be placed without the discount
   const [checkingCoupon, setCheckingCoupon] = useState(false)
-  const [payOnline, setPayOnline] = useState(false)
-  // Razorpay only: the checkout opened for this cart ({ checkout, total, razorpay }), and the signed
-  // payment once Razorpay has taken it. Keeping the payment means a failed confirmation is retried,
-  // never charged twice. While a checkout is open the cart and details are locked.
-  const [pending, setPending] = useState(null)
-  const [payment, setPayment] = useState(null)
-  const [order, setOrder] = useState(null) // the placed order: { id, total, paid }
+  const [paymentMethod, setPaymentMethod] = useState('')
+  const [order, setOrder] = useState(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
-
-  useEffect(() => {
-    api('/config').then((c) => setPayOnline(Boolean(c.razorpayKeyId))).catch(() => {})
-  }, [])
 
   // Logged in: start from the default saved address, or at least the account's name and phone
   useEffect(() => {
@@ -250,7 +220,7 @@ export default function Cart() {
   // A changed cart needs the coupon re-checked against the new lines
   const couponCode = quote?.coupon
   useEffect(() => {
-    if (!couponCode || pending || lines.length === 0) return
+    if (!couponCode || lines.length === 0) return
     let current = true
     setCheckingCoupon(true)
     api('/cart/quote', { method: 'POST', body: { items: linesForServer(lines), coupon: couponCode } })
@@ -273,22 +243,12 @@ export default function Cart() {
   }
 
   const finish = (placed) => {
-    setOrder(placed)
-    setPending(null)
-    setPayment(null)
+    const method = placed.paymentMethod ?? paymentMethod
+    const whatsappUrl = whatsappOrderUrl(placed, lines, method)
+    setOrder({ ...placed, paymentMethod: method, whatsappUrl })
     setQuote(null)
     clear()
-    window.location.assign(whatsappOrderUrl(placed, lines))
-  }
-
-  const confirmPayment = async (checkout, signed) => {
-    finish(await api('/orders/pay', { method: 'POST', body: { checkout: checkout.checkout, ...signed } }))
-  }
-
-  const pay = async (checkout) => {
-    const signed = await collectPayment(checkout, { ...address, email: customer?.email ?? email })
-    setPayment(signed)
-    await confirmPayment(checkout, signed)
+    window.location.assign(whatsappUrl)
   }
 
   const placeOrder = async (e) => {
@@ -297,9 +257,6 @@ export default function Cart() {
     setBusy(true)
     setError(null)
     try {
-      if (payment) return await confirmPayment(pending, payment)
-      if (pending) return await pay(pending)
-
       const saved = await api('/orders', {
         method: 'POST',
         body: {
@@ -308,12 +265,11 @@ export default function Cart() {
           note,
           items: linesForServer(lines),
           coupon: quote?.coupon ?? null,
+          paymentMethod,
           saveAddress: Boolean(customer) && addressChoice === NEW_ADDRESS && saveAddress,
         },
       })
-      if (!saved.razorpay) return finish(saved)
-      setPending(saved)
-      await pay(saved)
+      finish(saved)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -321,15 +277,7 @@ export default function Cart() {
     }
   }
 
-  // Lets the shopper change the cart or details after closing the payment window without paying
-  const cancelPayment = () => {
-    setPending(null)
-    setError(null)
-  }
-
-  if (busy && (!pending || payment)) {
-    return <OrderLoading confirmingPayment={Boolean(payment)} />
-  }
+  if (busy) return <OrderLoading />
 
   if (order) {
     return (
@@ -342,9 +290,9 @@ export default function Cart() {
             {order.discount > 0 && <span className="text-green-700"> (you saved ₹{order.discount})</span>}
           </p>
           <p className="mt-3 text-ink/70">
-            {order.paid
-              ? 'Payment received. We will message you when it ships.'
-              : `Pay on delivery. We will call you on ${address.phone} to confirm.`}
+            {order.paymentMethod === 'upi'
+              ? 'Send your order message on WhatsApp. We’ll reply with our QR code and UPI ID so you can pay.'
+              : `Pay in cash on delivery. We will call you on ${address.phone} to confirm.`}
           </p>
         </div>
         <div className="mt-6 flex justify-center gap-6">
@@ -354,6 +302,14 @@ export default function Cart() {
           <Link to="/" className="font-semibold text-brand">Back to shop</Link>
           <Link to="/contact" className="font-semibold text-brand">Contact us</Link>
         </div>
+        <a
+          href={order.whatsappUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-6 inline-block font-semibold text-brand"
+        >
+          Send order on WhatsApp
+        </a>
       </div>
     )
   }
@@ -368,13 +324,11 @@ export default function Cart() {
     )
   }
 
-  const locked = Boolean(pending)
+  const locked = busy
   const subtotal = quote?.subtotal ?? total
   const discount = quote?.discount ?? 0
-  const amount = pending?.total ?? quote?.total ?? total
-  let buttonLabel = payOnline ? `Pay ₹${amount}` : `Place order · ₹${amount}`
-  if (payment) buttonLabel = busy ? 'Confirming payment…' : 'Retry confirming payment'
-  else if (busy) buttonLabel = pending ? 'Waiting for payment…' : 'Placing order…'
+  const amount = quote?.total ?? total
+  const buttonLabel = busy ? 'Placing order…' : `Place order · ₹${amount}`
 
   return (
     <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-2">
@@ -450,19 +404,37 @@ export default function Cart() {
         </fieldset>
 
         {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
-        {payment && !busy && (
-          <p className="text-sm text-ink/70">Razorpay has your payment. Confirming it will not charge you again.</p>
-        )}
+
+        <fieldset disabled={locked}>
+          <legend className={labelClass}>Payment method</legend>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {PAYMENT_METHODS.map((option) => (
+              <label
+                key={option.value}
+                className={`flex cursor-pointer gap-3 rounded-xl border-2 p-3 text-sm ${
+                  paymentMethod === option.value ? 'border-brand' : 'border-neutral-200'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  required
+                  value={option.value}
+                  checked={paymentMethod === option.value}
+                  onChange={() => setPaymentMethod(option.value)}
+                  className="mt-1 accent-brand"
+                />
+                <span>
+                  <span className="font-semibold">{option.label}</span>
+                  <span className="block text-ink/60">{option.hint}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <button disabled={busy || checkingCoupon} className={primaryButton}>{checkingCoupon ? 'Checking coupon…' : buttonLabel}</button>
-        {pending && !payment && !busy && (
-          <button type="button" onClick={cancelPayment} className="block w-full text-center text-sm font-semibold text-ink/60 hover:text-brand">
-            Change cart or details
-          </button>
-        )}
-        <p className="text-center text-xs text-ink/50">
-          {payOnline ? 'Secure payment by Razorpay: UPI, cards and netbanking.' : 'Pay on delivery. We call you to confirm the order.'}
-        </p>
+        <p className="text-center text-xs text-ink/50">After placing your order, send the order message on WhatsApp.</p>
       </form>
     </div>
   )

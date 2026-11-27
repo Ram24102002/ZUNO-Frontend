@@ -34,18 +34,20 @@ function useSubmit(action) {
 
 /** The only way in: a full-page trip to Google and back (the backend sends the shopper on to `from` afterwards). */
 function GoogleButton({ from }) {
-  const [enabled, setEnabled] = useState(null) // null while checking
+  const [loginUrl, setLoginUrl] = useState(null) // null while checking
 
   useEffect(() => {
-    api('/config').then((c) => setEnabled(Boolean(c.googleLogin))).catch(() => setEnabled(false))
+    api('/config')
+      .then((config) => setLoginUrl(config.googleLogin ? config.googleLoginUrl || '/api/zuno/account/google' : ''))
+      .catch(() => setLoginUrl(''))
   }, [])
 
-  if (enabled === null) return null
-  if (!enabled) return <p className="text-sm text-ink/60">Signing in is not available right now. Please try again later.</p>
+  if (loginUrl === null) return null
+  if (!loginUrl) return <p className="text-sm text-ink/60">Signing in is not available right now. Please try again later.</p>
 
   return (
     <a
-      href={`/api/zuno/account/google?from=${encodeURIComponent(from)}`}
+      href={`${loginUrl}?from=${encodeURIComponent(from)}`}
       className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-neutral-200 py-3 text-sm font-semibold transition hover:border-ink"
     >
       <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
